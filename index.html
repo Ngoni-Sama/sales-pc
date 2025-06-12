@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Business Manager</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .summary-cards {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 23%;
+            text-align: center;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .customer-badge {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .low-stock {
+            color: #e53935;
+            font-weight: bold;
+        }
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Computer Business Manager</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('sales')">Sales</div>
+            <div class="tab" onclick="openTab('inventory')">Inventory</div>
+            <div class="tab" onclick="openTab('customers')">Customers</div>
+            <div class="tab" onclick="openTab('reports')">Reports</div>
+            <div class="tab" onclick="openTab('services')">Services</div>
+        </div>
+        
+        <!-- Sales Tab -->
+        <div id="sales" class="tab-content active">
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Today's Sales</h3>
+                    <p id="today-sales">$0.00</p>
+                </div>
+                <div class="card">
+                    <h3>Today's Profit</h3>
+                    <p id="today-profit">$0.00</p>
+                </div>
+                <div class="card">
+                    <h3>Items Sold</h3>
+                    <p id="items-sold">0</p>
+                </div>
+                <div class="card">
+                    <h3>Avg. Profit Margin</h3>
+                    <p id="avg-margin">0%</p>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="search-sales" placeholder="Search sales...">
+            </div>
+            
+            <table id="sales-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Buying Price</th>
+                        <th>Selling Price</th>
+                        <th>Quantity</th>
+                        <th>Profit</th>
+                        <th>Customer</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Sample row -->
+                    <tr>
+                        <td><input type="date" value="2023-11-15"></td>
+                        <td><input type="text" value="Dell XPS 15"></td>
+                        <td>
+                            <select>
+                                <option>Laptop</option>
+                                <option>Desktop</option>
+                                <option>Component</option>
+                                <option>Accessory</option>
+                                <option>Software</option>
+                            </select>
+                        </td>
+                        <td><input type="number" value="1200" step="0.01"></td>
+                        <td><input type="number" value="1499" step="0.01"></td>
+                        <td><input type="number" value="1"></td>
+                        <td>$299.00</td>
+                        <td><input type="text" value="John Smith"></td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addSale()">Add Sale</button>
+            <button onclick="calculateTotals()">Calculate Totals</button>
+            <button onclick="exportToCSV()">Export to CSV</button>
+            
+            <div class="chart-container">
+                <h3>Today's Sales Breakdown</h3>
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Inventory Tab -->
+        <div id="inventory" class="tab-content">
+            <h2>Inventory Management</h2>
+            <div class="search-bar">
+                <input type="text" id="search-inventory" placeholder="Search inventory...">
+            </div>
+            
+            <table id="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Buying Price</th>
+                        <th>Selling Price</th>
+                        <th>Stock</th>
+                        <th>Min Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="Dell XPS 15"></td>
+                        <td>
+                            <select>
+                                <option>Laptop</option>
+                                <option selected>Desktop</option>
+                                <option>Component</option>
+                                <option>Accessory</option>
+                                <option>Software</option>
+                            </select>
+                        </td>
+                        <td><input type="number" value="1200" step="0.01"></td>
+                        <td><input type="number" value="1499" step="0.01"></td>
+                        <td><input type="number" value="5"></td>
+                        <td><input type="number" value="3"></td>
+                        <td>In Stock</td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Logitech MX Master 3"></td>
+                        <td>
+                            <select>
+                                <option>Laptop</option>
+                                <option>Desktop</option>
+                                <option>Component</option>
+                                <option selected>Accessory</option>
+                                <option>Software</option>
+                            </select>
+                        </td>
+                        <td><input type="number" value="45" step="0.01"></td>
+                        <td><input type="number" value="79.99" step="0.01"></td>
+                        <td><input type="number" value="2"></td>
+                        <td><input type="number" value="5"></td>
+                        <td class="low-stock">Low Stock</td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addInventoryItem()">Add Item</button>
+            <button onclick="checkLowStock()">Check Low Stock</button>
+            <button onclick="exportInventory()">Export Inventory</button>
+            
+            <div class="chart-container">
+                <h3>Inventory Value by Category</h3>
+                <canvas id="inventoryChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Customers Tab -->
+        <div id="customers" class="tab-content">
+            <h2>Customer Management</h2>
+            <div class="search-bar">
+                <input type="text" id="search-customers" placeholder="Search customers...">
+            </div>
+            
+            <table id="customers-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Total Purchases</th>
+                        <th>Last Purchase</th>
+                        <th>Customer Since</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="John Smith"></td>
+                        <td><input type="email" value="john@example.com"></td>
+                        <td><input type="tel" value="555-123-4567"></td>
+                        <td>$2,398.99</td>
+                        <td>Nov 15, 2023</td>
+                        <td><input type="date" value="2023-05-10"></td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                            <button onclick="viewCustomerHistory(this)">History</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Sarah Johnson"></td>
+                        <td><input type="email" value="sarah@example.com"></td>
+                        <td><input type="tel" value="555-987-6543"></td>
+                        <td>$1,750.50</td>
+                        <td>Nov 10, 2023</td>
+                        <td><input type="date" value="2022-11-20"></td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                            <button onclick="viewCustomerHistory(this)">History</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addCustomer()">Add Customer</button>
+            <button onclick="exportCustomers()">Export Customers</button>
+            
+            <div class="chart-container">
+                <h3>Customer Value Distribution</h3>
+                <canvas id="customersChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2>Business Reports</h2>
+            
+            <div class="form-group">
+                <label for="report-period">Select Period:</label>
+                <select id="report-period">
+                    <option>Today</option>
+                    <option selected>This Week</option>
+                    <option>This Month</option>
+                    <option>This Quarter</option>
+                    <option>This Year</option>
+                    <option>Custom Range</option>
+                </select>
+            </div>
+            
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Total Revenue</h3>
+                    <p id="total-revenue">$4,149.49</p>
+                </div>
+                <div class="card">
+                    <h3>Total Profit</h3>
+                    <p id="total-profit">$1,024.99</p>
+                </div>
+                <div class="card">
+                    <h3>Items Sold</h3>
+                    <p id="total-items">7</p>
+                </div>
+                <div class="card">
+                    <h3>Avg. Margin</h3>
+                    <p id="total-margin">24.7%</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Sales Over Time</h3>
+                <canvas id="timeChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Sales by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Top Selling Products</h3>
+                <canvas id="productsChart"></canvas>
+            </div>
+            
+            <button onclick="generateReport()">Generate Report</button>
+            <button onclick="printReport()">Print Report</button>
+            <button onclick="exportReport()">Export Report</button>
+        </div>
+        
+        <!-- Services Tab -->
+        <div id="services" class="tab-content">
+            <h2>Service Management</h2>
+            
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Active Services</h3>
+                    <p id="active-services">3</p>
+                </div>
+                <div class="card">
+                    <h3>Completed Today</h3>
+                    <p id="completed-today">1</p>
+                </div>
+                <div class="card">
+                    <h3>Revenue</h3>
+                    <p id="service-revenue">$275.00</p>
+                </div>
+                <div class="card">
+                    <h3>Avg. Time</h3>
+                    <p id="avg-time">2.3 days</p>
+                </div>
+            </div>
+            
+            <table id="services-table">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Customer</th>
+                        <th>Device</th>
+                        <th>Issue</th>
+                        <th>Received</th>
+                        <th>Status</th>
+                        <th>Fee</th>
+                        <th>Technician</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#2023-045</td>
+                        <td><input type="text" value="John Smith"></td>
+                        <td><input type="text" value="Dell XPS 15"></td>
+                        <td><input type="text" value="Screen replacement"></td>
+                        <td><input type="date" value="2023-11-14"></td>
+                        <td>
+                            <select>
+                                <option>Received</option>
+                                <option selected>In Progress</option>
+                                <option>Waiting for Parts</option>
+                                <option>Ready for Pickup</option>
+                                <option>Completed</option>
+                            </select>
+                        </td>
+                        <td><input type="number" value="150" step="0.01"></td>
+                        <td><input type="text" value="Mike T."></td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                            <button onclick="completeService(this)">Complete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#2023-046</td>
+                        <td><input type="text" value="Sarah Johnson"></td>
+                        <td><input type="text" value="MacBook Pro 2020"></td>
+                        <td><input type="text" value="Virus removal"></td>
+                        <td><input type="date" value="2023-11-15"></td>
+                        <td>
+                            <select>
+                                <option selected>Received</option>
+                                <option>In Progress</option>
+                                <option>Waiting for Parts</option>
+                                <option>Ready for Pickup</option>
+                                <option>Completed</option>
+                            </select>
+                        </td>
+                        <td><input type="number" value="75" step="0.01"></td>
+                        <td><input type="text" value=""></td>
+                        <td>
+                            <button onclick="deleteRow(this)">Delete</button>
+                            <button onclick="completeService(this)">Complete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addService()">Add Service</button>
+            <button onclick="exportServices()">Export Services</button>
+            
+            <div class="chart-container">
+                <h3>Service Types</h3>
+                <canvas id="servicesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Tab functionality
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Update charts when tab is opened
+            if (tabName === 'sales') updateSalesChart();
+            if (tabName === 'inventory') updateInventoryChart();
+            if (tabName === 'customers') updateCustomersChart();
+            if (tabName === 'reports') updateReportsCharts();
+            if (tabName === 'services') updateServicesChart();
+        }
+        
+        // Sales table functions
+        function addSale() {
+            const table = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            newRow.innerHTML = `
+                <td><input type="date" value="${today}"></td>
+                <td><input type="text" placeholder="Item name"></td>
+                <td>
+                    <select>
+                        <option>Laptop</option>
+                        <option>Desktop</option>
+                        <option>Component</option>
+                        <option>Accessory</option>
+                        <option>Software</option>
+                    </select>
+                </td>
+                <td><input type="number" value="0" step="0.01" onchange="calculateProfit(this)"></td>
+                <td><input type="number" value="0" step="0.01" onchange="calculateProfit(this)"></td>
+                <td><input type="number" value="1" onchange="calculateProfit(this)"></td>
+                <td>$0.00</td>
+                <td><input type="text" placeholder="Customer name"></td>
+                <td>
+                    <button onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+        }
+        
+        function calculateProfit(input) {
+            const row = input.parentNode.parentNode;
+            const buyingPrice = parseFloat(row.cells[3].getElementsByTagName('input')[0].value) || 0;
+            const sellingPrice = parseFloat(row.cells[4].getElementsByTagName('input')[0].value) || 0;
+            const quantity = parseInt(row.cells[5].getElementsByTagName('input')[0].value) || 1;
+            
+            const profit = (sellingPrice - buyingPrice) * quantity;
+            row.cells[6].textContent = '$' + profit.toFixed(2);
+            
+            calculateTotals();
+        }
+        
+        function calculateTotals() {
+            const table = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            
+            let totalSales = 0;
+            let totalProfit = 0;
+            let totalItems = 0;
+            let totalMargin = 0;
+            let marginCount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const sellingPrice = parseFloat(rows[i].cells[4].getElementsByTagName('input')[0].value) || 0;
+                const buyingPrice = parseFloat(rows[i].cells[3].getElementsByTagName('input')[0].value) || 0;
+                const quantity = parseInt(rows[i].cells[5].getElementsByTagName('input')[0].value) || 1;
+                const profitText = rows[i].cells[6].textContent.replace('$', '');
+                const profit = parseFloat(profitText) || 0;
+                
+                totalSales += sellingPrice * quantity;
+                totalProfit += profit;
+                totalItems += quantity;
+                
+                if (sellingPrice > 0) {
+                    const margin = ((sellingPrice - buyingPrice) / sellingPrice) * 100;
+                    totalMargin += margin;
+                    marginCount++;
+                }
+            }
+            
+            document.getElementById('today-sales').textContent = '$' + totalSales.toFixed(2);
+            document.getElementById('today-profit').textContent = '$' + totalProfit.toFixed(2);
+            document.getElementById('items-sold').textContent = totalItems;
+            
+            const avgMargin = marginCount > 0 ? (totalMargin / marginCount) : 0;
+            document.getElementById('avg-margin').textContent = avgMargin.toFixed(1) + '%';
+            
+            updateSalesChart();
+        }
+        
+        // Inventory functions
+        function addInventoryItem() {
+            const table = document.getElementById('inventory-table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Item name"></td>
+                <td>
+                    <select>
+                        <option>Laptop</option>
+                        <option>Desktop</option>
+                        <option>Component</option>
+                        <option>Accessory</option>
+                        <option>Software</option>
+                    </select>
+                </td>
+                <td><input type="number" value="0" step="0.01"></td>
+                <td><input type="number" value="0" step="0.01"></td>
+                <td><input type="number" value="0"></td>
+                <td><input type="number" value="0"></td>
+                <td>In Stock</td>
+                <td>
+                    <button onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+        }
+        
+        function checkLowStock() {
+            const table = document.getElementById('inventory-table').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const stock = parseInt(rows[i].cells[4].getElementsByTagName('input')[0].value) || 0;
+                const minStock = parseInt(rows[i].cells[5].getElementsByTagName('input')[0].value) || 0;
+                const statusCell = rows[i].cells[6];
+                
+                if (stock === 0) {
+                    statusCell.textContent = "Out of Stock";
+                    statusCell.className = "low-stock";
+                } else if (stock <= minStock) {
+                    statusCell.textContent = "Low Stock";
+                    statusCell.className = "low-stock";
+                } else {
+                    statusCell.textContent = "In Stock";
+                    statusCell.className = "";
+                }
+            }
+        }
+        
+        // Customer functions
+        function addCustomer() {
+            const table = document.getElementById('customers-table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            const today = new Date().toISOString().split('T')[0];
+            
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Full name"></td>
+                <td><input type="email" placeholder="Email"></td>
+                <td><input type="tel" placeholder="Phone"></td>
+                <td>$0.00</td>
+                <td>Never</td>
+                <td><input type="date" value="${today}"></td>
+                <td>
+                    <button onclick="deleteRow(this)">Delete</button>
+                    <button onclick="viewCustomerHistory(this)">History</button>
+                </td>
+            `;
+        }
+        
+        function viewCustomerHistory(button) {
+            const row = button.parentNode.parentNode;
+            const customerName = row.cells[0].getElementsByTagName('input')[0].value;
+            alert(`Showing purchase history for ${customerName}`);
+            // In a real app, this would show a modal with customer's purchase history
+        }
+        
+        // Service functions
+        function addService() {
+            const table = document.getElementById('services-table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            const today = new Date().toISOString().split('T')[0];
+            const nextTicket = Math.floor(Math.random() * 900) + 100;
+            
+            newRow.innerHTML = `
+                <td>#2023-${nextTicket}</td>
+                <td><input type="text" placeholder="Customer name"></td>
+                <td><input type="text" placeholder="Device model"></td>
+                <td><input type="text" placeholder="Issue description"></td>
+                <td><input type="date" value="${today}"></td>
+                <td>
+                    <select>
+                        <option selected>Received</option>
+                        <option>In Progress</option>
+                        <option>Waiting for Parts</option>
+                        <option>Ready for Pickup</option>
+                        <option>Completed</option>
+                    </select>
+                </td>
+                <td><input type="number" value="0" step="0.01"></td>
+                <td><input type="text" placeholder="Technician"></td>
+                <td>
+                    <button onclick="deleteRow(this)">Delete</button>
+                    <button onclick="completeService(this)">Complete</button>
+                </td>
+            `;
+            
+            updateServiceStats();
+        }
+        
+        function completeService(button) {
+            const row = button.parentNode.parentNode;
+            const statusSelect = row.cells[5].getElementsByTagName('select')[0];
+            statusSelect.value = "Completed";
+            
+            updateServiceStats();
+        }
+        
+        function updateServiceStats() {
+            const table = document.getElementById('services-table').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            
+            let activeServices = 0;
+            let completedToday = 0;
+            let totalRevenue = 0;
+            let today = new Date().toISOString().split('T')[0];
+            
+            for (let i = 0; i < rows.length; i++) {
+                const status = rows[i].cells[5].getElementsByTagName('select')[0].value;
+                const receivedDate = rows[i].cells[4].getElementsByTagName('input')[0].value;
+                const fee = parseFloat(rows[i].cells[6].getElementsByTagName('input')[0].value) || 0;
+                
+                if (status !== "Completed") {
+                    activeServices++;
+                } else if (receivedDate === today) {
+                    completedToday++;
+                }
+                
+                totalRevenue += fee;
+            }
+            
+            document.getElementById('active-services').textContent = activeServices;
+            document.getElementById('completed-today').textContent = completedToday;
+            document.getElementById('service-revenue').textContent = '$' + totalRevenue.toFixed(2);
+            
+            updateServicesChart();
+        }
+        
+        // General functions
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            
+            // Update relevant stats after deletion
+            if (document.getElementById('sales').classList.contains('active')) {
+                calculateTotals();
+            } else if (document.getElementById('services').classList.contains('active')) {
+                updateServiceStats();
+            }
+        }
+        
+        function exportToCSV() {
+            alert("Exporting sales data to CSV...");
+            // In a real app, this would generate and download a CSV file
+        }
+        
+        function exportInventory() {
+            alert("Exporting inventory data to CSV...");
+        }
+        
+        function exportCustomers() {
+            alert("Exporting customer data to CSV...");
+        }
+        
+        function exportServices() {
+            alert("Exporting service data to CSV...");
+        }
+        
+        function generateReport() {
+            alert("Generating business report...");
+            updateReportsCharts();
+        }
+        
+        function printReport() {
+            window.print();
+        }
+        
+        function exportReport() {
+            alert("Exporting report to PDF...");
+        }
+        
+        // Chart functions
+        function updateSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // Sample data - in a real app, this would come from your sales data
+            const data = {
+                labels: ['Laptops', 'Desktops', 'Components', 'Accessories', 'Software'],
+                datasets: [{
+                    label: 'Sales by Category',
+                    data: [1499, 0, 299.99, 159.98, 0],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            // Destroy previous chart if it exists
+            if (window.salesChart) {
+                window.salesChart.destroy();
+            }
+            
+            window.salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateInventoryChart() {
+            const ctx = document.getElementById('inventoryChart').getContext('2d');
+            
+            // Sample data
+            const data = {
+                labels: ['Laptops', 'Desktops', 'Components', 'Accessories', 'Software'],
+                datasets: [{
+                    label: 'Inventory Value',
+                    data: [6000, 0, 1200, 320, 0],
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+            
+            if (window.inventoryChart) {
+                window.inventoryChart.destroy();
+            }
+            
+            window.inventoryChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateCustomersChart() {
+            const ctx = document.getElementById('customersChart').getContext('2d');
+            
+            // Sample data
+            const data = {
+                labels: ['<$500', '$500-$1000', '$1000-$2000', '>$2000'],
+                datasets: [{
+                    label: 'Customers by Spending',
+                    data: [15, 8, 5, 2],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            if (window.customersChart) {
+                window.customersChart.destroy();
+            }
+            
+            window.customersChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true
+                }
+            });
+        }
+        
+        function updateReportsCharts() {
+            // Time chart
+            const timeCtx = document.getElementById('timeChart').getContext('2d');
+            const timeData = {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [1200, 1900, 800, 1400, 1200, 1000, 800],
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }, {
+                    label: 'Profit',
+                    data: [300, 450, 200, 350, 300, 250, 200],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            };
+            
+            if (window.timeChart) {
+                window.timeChart.destroy();
+            }
+            
+            window.timeChart = new Chart(timeCtx, {
+                type: 'line',
+                data: timeData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Category chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryData = {
+                labels: ['Laptops', 'Desktops', 'Components', 'Accessories', 'Services'],
+                datasets: [{
+                    label: 'Revenue by Category',
+                    data: [3200, 1500, 800, 600, 275],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5
